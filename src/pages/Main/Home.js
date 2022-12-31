@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/ProductCard";
-import { toggleBrand, toggleStock } from "../../redux/actions/filterAction";
-import { loadProduct } from "../../redux/actions/productAction";
-import loadProductData from "../../redux/thunk/products/fetchProduct";
+import { toggle, toggleBrand } from "../../features/filter/filterSlice";
+import { getProducts } from "../../features/products/productSlice";
 
 const Home = () => {
-  // const [products, setProducts] = useState([]);
-  const filters = useSelector((state) => state.filter.filters);
-  const products = useSelector((state) => state.product.products);
-  console.log(products);
-  const { brands, stock } = filters;
+  const { products, isLoading } = useSelector((state) => state.products);
 
   const dispatch = useDispatch();
+  const filter = useSelector((state) => state.filter);
+  const { brands, stock } = filter;
 
   useEffect(() => {
-    dispatch(loadProductData());
-  }, [dispatch]);
+    // fetch("http://localhost:5000/moon")
+    //   .then((res) => res.json())
+    //   .then((data) => setProducts(data));
+    dispatch(getProducts());
+  }, []);
 
   const activeClass = "text-white  bg-indigo-500 border-white";
 
   let content;
+
+  if (isLoading) {
+    content = <>loading..........</>;
+  }
 
   if (products.length) {
     content = products.map((product) => (
@@ -28,7 +32,7 @@ const Home = () => {
     ));
   }
 
-  if (products.length && (stock || brands.length)) {
+  if (products.length && (filter.stock || filter.brands.length)) {
     content = products
       .filter((product) => {
         if (stock) {
@@ -37,8 +41,8 @@ const Home = () => {
         return product;
       })
       .filter((product) => {
-        if (brands.length) {
-          return brands.includes(product.brand);
+        if (filter.brands.length) {
+          return filter.brands.includes(product.brand);
         }
         return product;
       })
@@ -49,7 +53,7 @@ const Home = () => {
     <div className="max-w-7xl gap-14 mx-auto my-10">
       <div className="mb-10 flex justify-end gap-5">
         <button
-          onClick={() => dispatch(toggleStock())}
+          onClick={() => dispatch(toggle())}
           className={`border px-3 py-2 rounded-full font-semibold ${
             stock ? activeClass : null
           } `}

@@ -1,0 +1,22 @@
+1st step =>  store create 
+
+import { configureStore } from "@reduxjs/toolkit";
+
+const store = configureStore({
+  reducer: {},
+});
+
+export default store;
+
+
+second stpe ---- 2
+
+create slice==>>
+
+reducers: {
+  ../////
+}
+
+third step ----
+midileware
+middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
