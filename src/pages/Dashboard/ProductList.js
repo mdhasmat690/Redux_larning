@@ -1,33 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
 import {
-  getProducts,
-  removeProduct,
-  toggleDeleteSuccess,
-} from "../../features/products/productSlice";
+  useGetProductsQuery,
+  useRemoveProductMutation,
+} from "../../features/api/apiSlice";
 
 const ProductList = () => {
-  const dispatch = useDispatch();
-  const filter = useSelector((state) => state.filter);
-  const { brands, stock } = filter;
-  const { products, isLoading, deleteSuccess } = useSelector(
-    (state) => state.products
-  );
+  const [removeProduct, { deleteSuccess, isSuccess }] =
+    useRemoveProductMutation();
+
+  const { data, isLoading } = useGetProductsQuery(null, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  const products = data;
 
   useEffect(() => {
-    // fetch("http://localhost:5000/moon")
-    //   .then((res) => res.json())
-    //   .then((data) => setProducts(data));
-    dispatch(getProducts());
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && deleteSuccess) {
+    if (isSuccess) {
       toast.success("Successfully delete");
-      dispatch(toggleDeleteSuccess());
     }
-  }, [dispatch, isLoading, deleteSuccess]);
+  }, [isLoading, deleteSuccess, isSuccess]);
 
   if (isLoading) {
     return <>Loading...</>;
@@ -91,7 +83,7 @@ const ProductList = () => {
                   </td>
                   <td class="p-2">
                     <div class="flex justify-center">
-                      <button onClick={() => dispatch(removeProduct(_id))}>
+                      <button onClick={() => removeProduct(_id)}>
                         <svg
                           class="w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1"
                           fill="none"
